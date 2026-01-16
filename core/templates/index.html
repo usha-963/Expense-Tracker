@@ -1,0 +1,15 @@
+<canvas id="expenseChart"></canvas>
+<script>
+const ctx = document.getElementById('expenseChart');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Food', 'Bills', 'Travel'],
+        datasets: [{
+            label: 'Monthly Expense',
+            data: [1200, 1500, 800],
+            backgroundColor: ['red', 'blue', 'green']
+        }]
+    }
+});
+</script>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Financial Advisor | Add Transaction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #f8961e;
+            --info-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .budget-progress {
+            height: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .budget-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .kanban-board {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+        }
+        
+        .kanban-column {
+            min-width: 280px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .kanban-header {
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .kanban-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .kanban-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .ai-advice-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ai-advice-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .ai-advice-header i {
+            font-size: 24px;
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .ai-advice-content {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .transaction-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            background: white;
+            margin: 0 5px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .summary-card h5 {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card p {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .summary-income {
+            border-top: 3px solid #28a745;
+        }
+        
+        .summary-expense {
+            border-top: 3px solid #dc3545;
+        }
+        
+        .summary-balance {
+            border-top: 3px solid #007bff;
+        }
+        
+        .ai-suggestions {
+            margin-top: 20px;
+        }
+        
+        .suggestion-item {
+            padding: 10px;
+            border-left: 3px solid var(--primary-color);
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 0 5px 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header text-center">
+                        <h2 class="mb-0"><i class="fas fa-robot me-2"></i>AI Financial Advisor</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="transaction-summary">
+                            <div class="summary-card summary-income">
+                                <h5>Monthly Income</h5>
+                                <p>₹{{ monthly_income|floatformat:2 }}</p>
+                            </div>
+                            <div class="summary-card summary-expense">
+                                <h5>Monthly Expense</h5>
+                                <p>₹{{ monthly_spending|floatformat:2 }}</p>
+                            </div>
+                            <div class="summary-card summary-balance">
+                                <h5>Current Balance</h5>
+                                <p>₹{{ current_balance|floatformat:2 }}</p>
+                            </div>
+                        </div>
+
+                        {% if monthly_budget %}
+                        <div class="mb-4">
+                            <div class="budget-info">
+                                <span>Monthly Budget: ₹{{ monthly_budget|floatformat:2 }}</span>
+                                <span>{{ budget_percentage|floatformat:0 }}% Used</span>
+                            </div>
+                            <div class="progress budget-progress">
+                                <div class="progress-bar 
+                                    {% if budget_percentage > 90 %}bg-danger
+                                    {% elif budget_percentage > 70 %}bg-warning
+                                    {% else %}bg-success{% endif %}" 
+                                    role="progressbar" 
+                                    style="width: {{ budget_percentage }}%" 
+                                    aria-valuenow="{{ budget_percentage }}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <form method="post" id="transactionForm">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Transaction Type</label>
+                                <select class="form-select" name="type" id="type" onchange="toggleFields()" required>
+                                    <option value="Income">Income</option>
+                                    <option value="Expense" selected>Expense</option>
+                                    <option value="Withdrawal">Withdrawal</option>
+                                    <option value="Investment">Investment</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Amount (₹)</label>
+                                <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required oninput="generateAiAdvice()">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <input type="text" class="form-control" id="description" name="description" required oninput="generateAiAdvice()">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="payment_mode" class="form-label">Payment Mode</label>
+                                <select class="form-select" name="payment_mode" id="payment_mode" required>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Card">Card</option>
+                                    <option value="Online">Online</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="categoryField">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-select" name="category" id="category" onchange="generateAiAdvice()">
+                                    <option value="">-- Auto Detect --</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3 hidden" id="investmentField">
+                                <label for="investment_type" class="form-label">Investment Type</label>
+                                <select class="form-select" name="investment_type" id="investment_type">
+                                    <option value="Stocks">Stocks</option>
+                                    <option value="Mutual Funds">Mutual Funds</option>
+                                    <option value="FD/RD">FD/RD</option>
+                                    <option value="Crypto">Crypto</option>
+                                    <option value="Real Estate">Real Estate</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3 hidden" id="withdrawalField">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_consumed" id="is_consumed">
+                                    <label class="form-check-label" for="is_consumed">Mark as Consumed</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_recurring" id="isRecurring" onchange="toggleRecurring()">
+                                    <label class="form-check-label" for="isRecurring">Recurring Transaction</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 hidden" id="recurringFrequencyField">
+                                <label for="recurring_frequency" class="form-label">Recurring Frequency</label>
+                                <select class="form-select" name="recurring_frequency" id="recurring_frequency">
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Weekly">Weekly</option>
+                                    <option value="Yearly">Yearly</option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary me-md-2">
+                                    <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                                </a>
+                                <button type="submit" class="btn btn-primary pulse-animation">
+                                    <i class="fas fa-plus-circle me-1"></i> Add Transaction
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- AI Advice Section -->
+                <div class="ai-advice-container" id="aiAdviceContainer">
+                    <div class="ai-advice-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <h4 class="mb-0">AI Financial Advice</h4>
+                    </div>
+                    <div class="ai-advice-content" id="aiAdviceContent">
+                        <p class="text-muted">Enter transaction details to get personalized financial advice...</p>
+                    </div>
+                    
+                    <div class="ai-suggestions mt-3 hidden" id="aiSuggestions">
+                        <h5><i class="fas fa-bolt me-2"></i>Quick Suggestions</h5>
+                        <div class="suggestion-item">
+                            <strong>Budget Adjustment:</strong> Consider reducing dining out expenses this month.
+                        </div>
+                        <div class="suggestion-item">
+                            <strong>Savings Tip:</strong> Automate 20% of your income to savings.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kanban Board for Transaction Management -->
+                <div class="kanban-board mt-4">
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <span>Pending</span>
+                            <span class="badge bg-primary">3</span>
+                        </div>
+                        <div class="kanban-item">
+                            <strong>Internet Bill</strong>
+                            <p class="mb-0 text-muted small">₹1200 - Due in 3 days</p>
+                        </div>
+                        <div class="kanban-item">
+                            <strong>Credit Card</strong>
+                            <p class="mb-0 text-muted small">₹8500 - Due in 7 days</p>
+                        </div>
+                    </div>
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <span>Completed</span>
+                            <span class="badge bg-success">5</span>
+                        </div>
+                        <div class="kanban-item">
+                            <strong>Salary</strong>
+                            <p class="mb-0 text-muted small">₹45,000 - 1st May</p>
+                        </div>
+                        <div class="kanban-item">
+                            <strong>Groceries</strong>
+                            <p class="mb-0 text-muted small">₹2,500 - 3rd May</p>
+                        </div>
+                    </div>
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <span>Recurring</span>
+                            <span class="badge bg-info">4</span>
+                        </div>
+                        <div class="kanban-item">
+                            <strong>Rent</strong>
+                            <p class="mb-0 text-muted small">₹15,000 - Monthly</p>
+                        </div>
+                        <div class="kanban-item">
+                            <strong>Netflix</strong>
+                            <p class="mb-0 text-muted small">₹649 - Monthly</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Initialize Toastr
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "5000"
+        };
+
+        // Toggle fields based on transaction type
+        function toggleFields() {
+            const type = document.getElementById('type').value;
+            
+            document.getElementById('categoryField').style.display = 
+                (type === 'Income' || type === 'Investment') ? 'none' : 'block';
+                
+            document.getElementById('withdrawalField').style.display = 
+                (type === 'Withdrawal') ? 'block' : 'none';
+                
+            document.getElementById('investmentField').style.display = 
+                (type === 'Investment') ? 'block' : 'none';
+                
+            generateAiAdvice();
+        }
+
+        // Toggle recurring frequency field
+        function toggleRecurring() {
+            document.getElementById('recurringFrequencyField').style.display =
+                document.getElementById('isRecurring').checked ? 'block' : 'none';
+        }
+
+        // Generate AI advice based on form inputs
+        function generateAiAdvice() {
+            const type = document.getElementById('type').value;
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const description = document.getElementById('description').value.toLowerCase();
+            const category = document.getElementById('category').value;
+            const budgetPercentage = parseFloat("{{ budget_percentage|default:'0' }}");
+            
+            let advice = "";
+            let showSuggestions = false;
+            
+            if (amount > 0) {
+                if (type === 'Expense') {
+                    // Expense advice
+                    if (amount > 10000) {
+                        advice = `⚠️ This is a significant expense (₹${amount.toLocaleString()}). Consider if this is essential or can be postponed.`;
+                    } else if (amount > 5000) {
+                        advice = `This is a moderate expense. Make sure it fits within your monthly budget.`;
+                    }
+                    
+                    if (budgetPercentage > 80) {
+                        advice += `<br><br>🚨 You've used ${budgetPercentage}% of your monthly budget. Consider reducing non-essential expenses.`;
+                        showSuggestions = true;
+                    }
+                    
+                    // Category specific advice
+                    if (description.includes('dining') || description.includes('restaurant')) {
+                        advice += `<br><br>🍽️ Dining out frequently can add up. Consider cooking at home more often to save money.`;
+                    } else if (description.includes('shopping') || description.includes('clothes')) {
+                        advice += `<br><br>🛍️ For shopping expenses, consider waiting 24 hours before purchasing to avoid impulse buys.`;
+                    }
+                    
+                } else if (type === 'Income') {
+                    // Income advice
+                    if (amount > 50000) {
+                        advice = `💰 Great income! Consider allocating at least 20% to savings and investments.`;
+                        showSuggestions = true;
+                    } else {
+                        advice = `Consider following the 50/30/20 rule: 50% needs, 30% wants, 20% savings.`;
+                    }
+                    
+                } else if (type === 'Investment') {
+                    // Investment advice
+                    if (amount > 20000) {
+                        advice = `📈 This is a substantial investment. Consider diversifying across different asset classes.`;
+                    } else {
+                        advice = `Regular investments, even small amounts, can grow significantly over time due to compounding.`;
+                    }
+                    showSuggestions = true;
+                }
+                
+                if (advice === "") {
+                    advice = "This transaction looks good. Keep tracking your finances!";
+                }
+                
+                document.getElementById('aiAdviceContent').innerHTML = advice;
+                document.getElementById('aiSuggestions').classList.toggle('hidden', !showSuggestions);
+            }
+        }
+
+        // Form submission with AJAX
+        $(document).ready(function() {
+            $('#transactionForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.pathname,
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Transaction added successfully',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.href = "{% url 'dashboard' %}";
+                            });
+                        } else {
+                            toastr.error(response.message || 'Error adding transaction');
+                        }
+                    },
+                    error: function(xhr) {
+                        toastr.error('An error occurred. Please try again.');
+                    }
+                });
+            });
+        });
+
+        // Initialize tooltips
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        // Show welcome message
+        document.addEventListener('DOMContentLoaded', function() {
+            toastr.info('Welcome to your AI Financial Advisor! Start by adding a transaction.');
+            toggleFields();
+            
+            // Sample data for chart (you would replace with actual data from backend)
+            const ctx = document.createElement('canvas');
+            ctx.id = 'budgetChart';
+            document.getElementById('aiAdviceContainer').prepend(ctx);
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Needs', 'Wants', 'Savings'],
+                    datasets: [{
+                        data: [50, 30, 20],
+                        backgroundColor: [
+                            '#28a745',
+                            '#fd7e14',
+                            '#17a2b8'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Recommended Budget Allocation'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
