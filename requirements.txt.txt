@@ -1,0 +1,8 @@
+Django
+gunicorn
+whitenoise
+djangorestframework
+pandas
+numpy
+scikit-learn
+joblib
